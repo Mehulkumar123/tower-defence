@@ -148,15 +148,22 @@ class Defender {
 		this.spriteHeight = 194;
 		this.minFrame = 0;
 		this.maxFrame = 16;
+		this.chosenDefender = chosenDefender;
 	}
 	draw() {
-		ctx.fillStyle = "blue";
-		ctx.fillRect(this.x, this.y, this.width, this.height);
+		//ctx.fillStyle = "blue";
+		//ctx.fillRect(this.x, this.y, this.width, this.height);
 		ctx.fillStyle = "gold";
 		ctx.font = "30px orbitron";
 		ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30);
-		ctx.drawImage(defender1, this.frameX *this.spriteWidth,0,this.
-			spriteWidth, this.spriteHeight, this.x, this.y,this.width, this.height)
+		if(this.chosenDefender === 1){
+			ctx.drawImage(defender1, this.frameX *this.spriteWidth,0,this.
+			spriteWidth, this.spriteHeight, this.x, this.y,this.width, this.height);
+		}
+		else if(this.chosenDefender === 2){
+			ctx.drawImage(defender2, this.frameX *this.spriteWidth,0,this.
+			spriteWidth, this.spriteHeight, this.x, this.y,this.width, this.height);
+		}
 	}
 	update() {
 		if (frame % 10 === 0) {
@@ -164,12 +171,22 @@ class Defender {
 			else this.frameX = this.minFrame;
 			if (this.frameX === 15)this.shootNow = true;
 		}
-		if (this.shooting) {
-			this.minFrame = 0;
-			this.maxFrame = 15;
-		}else {
-			this.minFrame = 17;
-			this.maxFrame = 23;
+		if (this.chosenDefender === 1) {
+			if (this.shooting) {
+				this.minFrame = 0;
+				this.maxFrame = 15;
+			}else {
+				this.minFrame = 17;
+				this.maxFrame = 23;
+			}
+		}else if (this.chosenDefender === 2){
+			if (this.shooting) {
+				this.minFrame = 13;
+				this.maxFrame = 28;
+			}else{
+				this.minFrame = 0;
+				this.maxFrame = 12;
+			}
 		}
 
 		if(this.shooting && this.shootNow){
@@ -233,18 +250,16 @@ function chooseDefender() {
 		card1Stroke = 'black';
 		card2Stroke = 'black';
 	}
-
-
 	ctx.lineWidth = 1;
 	ctx.fillStyle = 'rgba(0,0,0,0.2)';
 	ctx.fillRect(card1.x,card1.y,card1.width,card1.height);
 	ctx.strokeStyle = card1Stroke;
-	ctx.fillRect(card2.x,card2.y,card2.width,card2.height);
+	ctx.strokeRect(card1.x,card1.y,card1.width,card1.height);
 	ctx.drawImage(defender1,0,0,194,194,0,5,194/2,194/2);
 	ctx.fillRect(card2.x,card2.y,card2.width,card2.height);
 	ctx.drawImage(defender2,0,0,194,194,80,5,194/2,194/2);
-	ctx.strokeStyle = card1Stroke;
-	ctx.strokeRect(card2.x,card2.y,card2.width,card2.height);
+	ctx.strokeStyle = card2Stroke;
+	ctx.strokeRect(card2.x,card2.y,card2.width,card2.height	)
 }
 
 //floating Messages
@@ -306,7 +321,11 @@ class Enemy {
 		this.frameX = 0;
 		this.frameY = 0;
 		this.minFrame = 0;
-		this.maxFrame = 4;
+		if(this.enemyType === enemy1){
+			this.maxFrame = 4;
+		}else if(this.enemyType === enemy2){
+			this.maxFrame = 7;
+		}
 		this.spriteWidth = 256;
 		this.spriteHeight = 256;
 	}
@@ -325,7 +344,7 @@ class Enemy {
 		ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30);
 		//ctx.drawImage(img,sx,sy,sw,sh,dx,dy,dw,dh);
 		ctx.drawImage(this.enemyType,this.frameX * this.spriteWidth,0,this.
-			spriteWidth,this.spriteHeight,this.x,this.y,this.width,this.height);
+		spriteWidth,this.spriteHeight,this.x,this.y,this.width,this.height);
 	}
 }
 function handleEnemies() {
@@ -358,6 +377,11 @@ function handleEnemies() {
 }
 
 //resources
+const resources1 = [];
+const powerup = new Image();
+powerup.src = 'powerup.png';
+resources1.push(resources1);
+
 const amounts =[20,30,40];
 class Resource {
 	constructor() {
@@ -366,14 +390,28 @@ class Resource {
 		this.width = cellSize * 0.6;
 		this.height = cellSize * 0.6;
 		this.amount = amounts[Math.floor(Math.random() * amounts.length)];
+		this.frameX = 0;
+		this.frameY = 0;
+		this.minFrame = 0;
+		this.maxFrame = 8;
+		this.spriteWidth = 128;
+		this.spriteHeight = 128;
 	}
 	draw() {
-		ctx.fillStyle ='yellow';
-		ctx.fillRect(this.x, this.y, this.width, this.height);
+		//ctx.fillStyle ='yellow';
+		//ctx.fillRect(this.x, this.y, this.width, this.height);
 		ctx.fillStyle = "black";
 		ctx.font = '20px orbitron';
 		ctx.fillText(this.amount, this.x +15, this.y + 25)
+		ctx.drawImage(powerup,this.frameX * this.spriteWidth,0,this.
+			spriteWidth, this.spriteHeight, this.x, this.y,this.width, this.height)
 	}
+	update() {
+		if (frame % 20 === 0) {
+			if (this.frameX < this.maxFrame)this.frameX ++;
+			else this.frameX = this.minFrame;
+		}
+	}s
 }
 function handleResources(){
 	if (frame % 500 === 0 && score < winningScore ){
@@ -381,12 +419,13 @@ function handleResources(){
 	}
 	for(let i = 0; i < resources.length; i++){
 		resources[i].draw();
+		resources[i].update();
 		if(resources[i] && mouse.x && mouse.y && collision( resources[i], mouse)){
 			numberOfResources += resources[i].amount;
 			floatingMessages.push(new floatingMessage('+' + resources[i].amount,
 			resources[i].x,resources[i].y,30,'black'));
-			floatingMessages.push(new floatingMessage('+' + resources[i].amount,250,
-			50,30,'gold'));
+			floatingMessages.push(new floatingMessage('+' + resources[i].amount,470,
+			85,30,'gold'));
 			resources.splice(i, 1);
 			i--;
 		}
