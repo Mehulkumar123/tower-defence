@@ -7,12 +7,13 @@ canvas.height = 600;
 const cellSize = 100;
 const cellGap = 3;
 
-let numberOfResources = 500;
+
+let numberOfResources = 5000;
 let enemiesInterval = 600;
 let frame = 0;
 let gameOver = false;
 let score = 0;
-const winningScore = 50;
+const winningScore = 500;
 let chosenDefender = 1;
 
 const gameGrid = [];
@@ -393,9 +394,9 @@ class Resource {
 		this.frameX = 0;
 		this.frameY = 0;
 		this.minFrame = 0;
-		this.maxFrame = 8;
-		this.spriteWidth = 128;
-		this.spriteHeight = 128;
+		this.maxFrame = 2;
+		this.spriteWidth = 130;
+		this.spriteHeight = 130;
 	}
 	draw() {
 		//ctx.fillStyle ='yellow';
@@ -407,7 +408,7 @@ class Resource {
 			spriteWidth, this.spriteHeight, this.x, this.y,this.width, this.height)
 	}
 	update() {
-		if (frame % 20 === 0) {
+		if (frame % 10 === 0) {
 			if (this.frameX < this.maxFrame)this.frameX ++;
 			else this.frameX = this.minFrame;
 		}
